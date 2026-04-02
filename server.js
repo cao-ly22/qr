@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const {google} = require('googleapis');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -22,34 +23,70 @@ app.post('/api/send', async (req, res) => {
       return res.status(400).json({ error: 'Email không hợp lệ.' });
     }
 
-    const emailUser = process.env.EMAIL_USER;
+    const emailUser = process.env.EMAIL_USER || 'taichinhdfs@gmail.com';
     const emailPass = process.env.EMAIL_PASS;
     const emailHost = process.env.EMAIL_HOST || (emailUser?.endsWith('@gmail.com') ? 'smtp.gmail.com' : undefined);
     const emailPort = Number(process.env.EMAIL_PORT || (emailHost === 'smtp.gmail.com' ? 587 : 587));
     const emailSecure = process.env.EMAIL_SECURE === 'true' || emailPort === 465;
-    const emailFrom = process.env.EMAIL_FROM || 'taichinhdfs@gmail.com';
+    const emailFrom = process.env.EMAIL_FROM || emailUser;
+
+    const oauthClientId = process.env.OAUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+    const oauthClientSecret = process.env.OAUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+    const oauthRefreshToken = process.env.OAUTH_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN;
+    const oauthRedirectUri = process.env.OAUTH_REDIRECT_URI || 'https://developers.google.com/oauthplayground';
+    const useOAuth2 = Boolean(oauthClientId && oauthClientSecret && oauthRefreshToken);
 
     const missing = [];
     if (!emailUser) missing.push('EMAIL_USER');
-    if (!emailPass) missing.push('EMAIL_PASS');
-    if (!emailHost) missing.push('EMAIL_HOST');
+
+    if (useOAuth2) {
+      if (!oauthClientId) missing.push('OAUTH_CLIENT_ID');
+      if (!oauthClientSecret) missing.push('OAUTH_CLIENT_SECRET');
+      if (!oauthRefreshToken) missing.push('OAUTH_REFRESH_TOKEN');
+    } else {
+      if (!emailPass) missing.push('EMAIL_PASS');
+      if (!emailHost) missing.push('EMAIL_HOST');
+    }
 
     if (missing.length > 0) {
       return res.status(500).json({
-        error: `SMTP chưa cấu hình. Thiếu biến: ${missing.join(', ')}. Đặt EMAIL_USER, EMAIL_PASS và nếu không dùng Gmail thì thêm EMAIL_HOST. ` +
-          `Bạn có thể dùng EMAIL_FROM để gửi từ địa chỉ khác.`
+        error: `SMTP/OAuth2 chưa cấu hình. Thiếu biến: ${missing.join(', ')}. ` +
+          `Vui lòng cấu hình EMAIL_USER và OAUTH_CLIENT_ID/OAUTH_CLIENT_SECRET/OAUTH_REFRESH_TOKEN cho OAuth2, hoặc EMAIL_PASS nếu dùng SMTP.`
       });
     }
 
-    const transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: emailPort,
-      secure: emailSecure,
-      auth: {
-        user: emailUser,
-        pass: emailPass
+    let transporter;
+    if (useOAuth2) {
+      const oauth2Client = new google.auth.OAuth2(oauthClientId, oauthClientSecret, oauthRedirectUri);
+      oauth2Client.setCredentials({ refresh_token: oauthRefreshToken });
+      const accessTokenResponse = await oauth2Client.getAccessToken();
+      const accessToken = accessTokenResponse?.token || accessTokenResponse;
+      if (!accessToken) {
+        throw new Error('Không lấy được access token OAuth2.');
       }
-    });
+
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: emailUser,
+          clientId: oauthClientId,
+          clientSecret: oauthClientSecret,
+          refreshToken: oauthRefreshToken,
+          accessToken
+        }
+      });
+    } else {
+      transporter = nodemailer.createTransport({
+        host: emailHost,
+        port: emailPort,
+        secure: emailSecure,
+        auth: {
+          user: emailUser,
+          pass: emailPass
+        }
+      });
+    }
 
     const info = await transporter.sendMail({
       from: emailFrom,
