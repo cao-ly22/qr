@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 ## Nội dung trong workspace
 - `server.js` - backend Node.js xử lý form và gửi email bằng `nodemailer`
@@ -96,5 +97,3 @@ Tệp cấu hình `render.yaml` đã được tạo trong thư mục `d:\qr`.
 - Gmail yêu cầu bật xác thực 2 bước và tạo App Password tại https://myaccount.google.com/apppasswords.
 - Nếu dùng Google Workspace, hãy kiểm tra cài đặt bảo mật tài khoản và quyền truy cập ứng dụng SMTP.
 - Nếu lỗi SMTP, kiểm tra lại `EMAIL_USER`, `EMAIL_PASS`, và đảm bảo `EMAIL_HOST`/`EMAIL_PORT` đúng.
-
-
