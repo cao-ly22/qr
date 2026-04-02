@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng ký khách hàng</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-container">
+    <header>
+      <h1>Đăng ký thông tin khách hàng</h1>
+      <p>Nhập thông tin để nhận giấy mời cùng mã QR qua email.</p>
+    </header>
+
+    <main>
+      <form id="customerForm">
+        <label for="fullName">Họ và tên</label>
+        <input id="fullName" name="fullName" type="text" required placeholder="Nguyễn Văn A" />
+
+        <label for="gender">Giới tính</label>
+        <select id="gender" name="gender" required>
+          <option value="">Chọn giới tính</option>
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+          <option value="Khác">Khác</option>
+        </select>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required placeholder="example@domain.com" />
+
+        <label for="phone">Số điện thoại</label>
+        <input id="phone" name="phone" type="tel" required placeholder="0912345678" />
+
+        <button type="submit">Gửi</button>
+      </form>
+
+      <div id="status" class="status hidden"></div>
+
+      <section class="preview-panel">
+        <div class="preview-card">
+          <h2>Preview giấy mời</h2>
+          <canvas id="invitationCanvas" width="900" height="550"></canvas>
+        </div>
+        <div class="preview-card">
+          <h2>Preview QR code</h2>
+          <canvas id="qrCanvas" width="400" height="400"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

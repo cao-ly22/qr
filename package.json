@@ -1,0 +1,14 @@
+{
+  "name": "customer-invite-web",
+  "version": "1.0.0",
+  "description": "Web form gửi email giấy mời và QR code cho khách hàng.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.0",
+    "express": "^4.18.4",
+    "nodemailer": "^8.0.4"
+  }
+}

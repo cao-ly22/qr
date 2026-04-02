@@ -1,0 +1,24 @@
+services:
+  - type: web_service
+    name: customer-invite-web
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 3000
+      - key: EMAIL_USER
+        value: taichinhdfs@gmail.com
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_FROM
+        value: "TaichinhDFS <taichinhdfs@gmail.com>"
+      - key: EMAIL_PASS
+        secure: true
