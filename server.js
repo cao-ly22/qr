@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/send', async (req, res) => {
   try {
-    const { fullName, gender, email, phone, invitationImage, qrImage } = req.body;
+    const { fullName, gender, email, phone, invitationImage } = req.body;
 
     if (!fullName || !gender || !email || !phone) {
       return res.status(400).json({ error: 'Vui lòng điền đầy đủ họ tên, giới tính, email và số điện thoại.' });
@@ -110,8 +110,7 @@ app.post('/api/send', async (req, res) => {
       text: generatePlainText(fullName, gender, phone, email),
       html: generateHtml(fullName, gender, phone, email),
       attachments: [
-        createAttachment(invitationImage, 'giay_moi.png'),
-        createAttachment(qrImage, 'qr_code.png')
+        createAttachment(invitationImage, 'giay_moi.png')
       ]
     });
 
@@ -146,7 +145,7 @@ function generateHtml(fullName, gender, phone, email) {
       <li>Email: ${email}</li>
       <li>Số điện thoại: ${phone}</li>
     </ul>
-    <p>Đính kèm email này có giấy mời và mã QR của bạn.</p>
+    <p>Đính kèm email này có thư mời đã cá nhân hóa tên khách hàng.</p>
     <p>Trân trọng,</p>
     <p>Đội ngũ hỗ trợ</p>`;
 }
