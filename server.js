@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const {google} = require('googleapis');
+const { appendRow } = require('./googleSheet');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -36,6 +37,13 @@ app.post('/api/send', async (req, res) => {
     const oauthRedirectUri = process.env.OAUTH_REDIRECT_URI || 'https://developers.google.com/oauthplayground';
     const useOAuth2 = Boolean(oauthClientId && oauthClientSecret && oauthRefreshToken);
 
+    const googleSheetId = process.env.GOOGLE_SHEET_ID;
+    const googleServiceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    let googleServiceAccountPrivateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+    if (googleServiceAccountPrivateKey) {
+      googleServiceAccountPrivateKey = googleServiceAccountPrivateKey.replace(/\\n/g, '\n');
+    }
+
     const missing = [];
     if (!emailUser) missing.push('EMAIL_USER');
 
@@ -48,12 +56,19 @@ app.post('/api/send', async (req, res) => {
       if (!emailHost) missing.push('EMAIL_HOST');
     }
 
+    if (!googleSheetId || !googleServiceAccountEmail || !googleServiceAccountPrivateKey) {
+      missing.push('GOOGLE_SHEET_ID/GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY');
+    }
+
     if (missing.length > 0) {
       return res.status(500).json({
-        error: `SMTP/OAuth2 chưa cấu hình. Thiếu biến: ${missing.join(', ')}. ` +
-          `Vui lòng cấu hình EMAIL_USER và OAUTH_CLIENT_ID/OAUTH_CLIENT_SECRET/OAUTH_REFRESH_TOKEN cho OAuth2, hoặc EMAIL_PASS nếu dùng SMTP.`
+        error: `SMTP/OAuth2/Google Sheets chưa cấu hình. Thiếu biến: ${missing.join(', ')}. ` +
+          `Vui lòng cấu hình EMAIL_USER + xác thực SMTP hoặc OAuth2, và GOOGLE_SHEET_ID + GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY cho Google Sheets.`
       });
     }
+
+    // Lưu dữ liệu đơn hàng vào Google Sheets trước khi gửi email
+    await appendRow([new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }), fullName, gender, email, phone]);
 
     let transporter;
     if (useOAuth2) {

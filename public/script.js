@@ -82,7 +82,7 @@ function buildInvitationImage(fullName, gender, email, phone) {
   invitationCtx.fillText('Số điện thoại: ' + phone, 70, 350);
 
   invitationCtx.fillStyle = '#2563eb';
-  invitationCtx.fillText('Hẹn gặp bạn tại sự kiện!', 70, 430);
+  invitationCtx.fillText('Sự hiện diện của quý khách là niềm vinh dự đối với chúng tôi!', 70, 430);
 }
 
 function buildQrCode(text) {

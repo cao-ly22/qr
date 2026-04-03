@@ -25,9 +25,25 @@ header {
   margin-bottom: 28px;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.company-logo {
+  max-width: 130px;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+}
+
 h1 {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
 }
 
 p {
