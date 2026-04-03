@@ -59,17 +59,24 @@ function buildInvitationImage(fullName, gender, email, phone) {
     template.onload = () => {
       invitationCtx.drawImage(template, 0, 0, width, height);
 
-      invitationCtx.fillStyle = '#ffffff';
-      invitationCtx.font = 'bold 32px Inter, Arial, sans-serif';
-      invitationCtx.textAlign = 'left';
-      invitationCtx.fillText(`Trân trọng kính mời: ${fullName || 'Quý khách'}`, 60, 250);
+      const message = `Trân trọng kính mời: ${fullName || 'Quý khách'}`;
+      invitationCtx.font = 'bold 40px Inter, Arial, sans-serif';
+      invitationCtx.textAlign = 'center';
+      invitationCtx.textBaseline = 'middle';
 
-      invitationCtx.font = '22px Inter, Arial, sans-serif';
-      invitationCtx.fillStyle = '#f8fafc';
-      invitationCtx.fillText(`Họ và tên: ${fullName || '-'}`, 60, 300);
-      invitationCtx.fillText(`Giới tính: ${gender || '-'}`, 60, 340);
-      invitationCtx.fillText(`Email: ${email || '-'}`, 60, 380);
-      invitationCtx.fillText(`Số điện thoại: ${phone || '-'}`, 60, 420);
+      const textX = width / 2;
+      const textY = 180;
+      const textWidth = invitationCtx.measureText(message).width;
+      const padding = 16;
+
+      invitationCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      invitationCtx.fillRect(textX - textWidth / 2 - padding, textY - 30, textWidth + padding * 2, 55);
+
+      invitationCtx.fillStyle = '#ffffff';
+      invitationCtx.shadowColor = 'rgba(0,0,0,0.5)';
+      invitationCtx.shadowBlur = 6;
+      invitationCtx.fillText(message, textX, textY);
+      invitationCtx.shadowBlur = 0;
 
       resolve();
     };
