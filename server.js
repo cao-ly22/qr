@@ -1,6 +1,6 @@
-require('dotenv').config();
-const express = require('express');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+const express = require('express');
 const nodemailer = require('nodemailer');
 const {google} = require('googleapis');
 const { appendRow } = require('./googleSheet');
@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/send', async (req, res) => {
   try {
-    const { fullName, gender, email, phone, invitationImage } = req.body;
+    const { fullName, gender, email, phone, invitationImage, invitationImageNew } = req.body;
 
     if (!fullName || !gender || !email || !phone) {
       return res.status(400).json({ error: 'Vui lòng điền đầy đủ họ tên, giới tính, email và số điện thoại.' });
@@ -110,7 +110,8 @@ app.post('/api/send', async (req, res) => {
       text: generatePlainText(fullName, gender, phone, email),
       html: generateHtml(fullName, gender, phone, email),
       attachments: [
-        createAttachment(invitationImage, 'giay_moi.png')
+        createAttachment(invitationImage, 'giay_moi_co_dien.png'),
+        createAttachment(invitationImageNew, 'giay_moi_hien_dai.png')
       ]
     });
 
@@ -133,7 +134,7 @@ function createAttachment(dataUrl, filename) {
 }
 
 function generatePlainText(fullName, gender, phone, email) {
-  return `Xin chào ${fullName},\n\nCảm ơn bạn đã gửi thông tin. Đây là giấy mời và mã QR đã được tạo cho bạn.\n\nThông tin của bạn:\n- Họ và tên: ${fullName}\n- Giới tính: ${gender}\n- Email: ${email}\n- Số điện thoại: ${phone}\n\nTrân trọng.`;
+  return `Xin chào ${fullName},\n\nCảm ơn bạn đã gửi thông tin. Đây là hai mẫu giấy mời đã được tạo cho bạn.\n\nThông tin của bạn:\n- Họ và tên: ${fullName}\n- Giới tính: ${gender}\n- Email: ${email}\n- Số điện thoại: ${phone}\n\nTrân trọng.`;
 }
 
 function generateHtml(fullName, gender, phone, email) {
@@ -145,7 +146,7 @@ function generateHtml(fullName, gender, phone, email) {
       <li>Email: ${email}</li>
       <li>Số điện thoại: ${phone}</li>
     </ul>
-    <p>Đính kèm email này có thư mời đã cá nhân hóa tên khách hàng.</p>
+    <p>Đính kèm email này có hai mẫu giấy mời (cổ điển và hiện đại) cho bạn.</p>
     <p>Trân trọng,</p>
     <p>Đội ngũ hỗ trợ</p>`;
 }
