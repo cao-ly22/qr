@@ -87,20 +87,20 @@ app.post('/api/send', async (req, res) => {
     }
 
     // ================= TRANSPORTER =================
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        type: 'OAuth2',
-        user: emailUser,
-        clientId: oauthClientId,
-        clientSecret: oauthClientSecret,
-        refreshToken: oauthRefreshToken,
-        accessToken
-      }
-    });
-
+  const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  family: 4, // 🔥 THÊM DÒNG NÀY (QUAN TRỌNG NHẤT)
+  auth: {
+    type: 'OAuth2',
+    user: emailUser,
+    clientId: oauthClientId,
+    clientSecret: oauthClientSecret,
+    refreshToken: oauthRefreshToken,
+    accessToken
+  }
+});
     // ================= SEND MAIL =================
     const info = await transporter.sendMail({
       from: emailFrom,
